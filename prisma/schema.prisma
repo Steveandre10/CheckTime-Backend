@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id_role     Int       @id @default(autoincrement())
+  nombre_rol  String
+  descripcion String?
+
+  usuarios    Usuario[]
+}
+
+model Usuario {
+  id_usuario     Int      @id @default(autoincrement())
+  nombre          String
+  apellido        String
+  correo          String   @unique
+  password_hash   String
+  documento       String   @unique
+  telefono        String?
+  estado          Boolean  @default(true)
+  fecha_creacion  DateTime @default(now())
+
+  id_role         Int
+  role            Role @relation(fields: [id_role], references: [id_role])
+
+  asistencias     Asistencia[]
+  horarios        Horario[]
+  permisos        Permiso[]
+  novedades       Novedad[]
+
+  coberturas_ausente   Cobertura[] @relation("DocenteAusente")
+  coberturas_cobertura Cobertura[] @relation("DocenteCobertura")
+}
+
+model Horario {
+  id_horario     Int @id @default(autoincrement())
+  nombre         String
+  dia_semana     String
+  hora_inicio    String
+  hora_fin       String
+  bloque         String
+
+  id_usuario     Int
+  usuario        Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  coberturas     Cobertura[]
+}
+
+model Asistencia {
+  id_asistencia             Int @id @default(autoincrement())
+  fecha                     DateTime
+  hora_entrada              DateTime?
+  hora_salida               DateTime?
+  estado                    String
+  minutos_tardanza          Int?
+  minutos_salida_anticipada Int?
+  observacion               String?
+
+  id_usuario                Int
+  usuario                   Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model TipoPermiso {
+  id_tipo_permiso Int @id @default(autoincrement())
+  nombre          String
+
+  permisos        Permiso[]
+}
+
+model Permiso {
+  id_permiso            Int @id @default(autoincrement())
+  fecha_inicio          DateTime
+  fecha_fin             DateTime
+  descripcion           String
+  archivo               String?
+  estado                String
+  fecha_solicitud       DateTime @default(now())
+  horas_anticipacion    Int?
+  cumple_regla          Boolean?
+
+  id_usuario            Int
+  usuario               Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  id_tipo_permiso       Int
+  tipo_permiso          TipoPermiso @relation(fields: [id_tipo_permiso], references: [id_tipo_permiso])
+}
+
+model TipoNovedad {
+  id_tipo_novedad Int @id @default(autoincrement())
+  nombre          String
+
+  novedades       Novedad[]
+}
+
+model Novedad {
+  id_novedad       Int @id @default(autoincrement())
+  fecha            DateTime
+  descripcion      String
+  archivo          String?
+  estado           String
+  horas_afectadas  Int?
+
+  id_usuario       Int
+  usuario          Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  id_tipo_novedad  Int
+  tipo_novedad     TipoNovedad @relation(fields: [id_tipo_novedad], references: [id_tipo_novedad])
+}
+
+model Cobertura {
+  id_cobertura Int @id @default(autoincrement())
+  fecha         DateTime
+  observacion   String?
+  estado        String
+
+  id_docente_ausente Int
+  docente_ausente Usuario @relation("DocenteAusente", fields: [id_docente_ausente], references: [id_usuario])
+
+  id_docente_cobertura Int
+  docente_cobertura Usuario @relation("DocenteCobertura", fields: [id_docente_cobertura], references: [id_usuario])
+
+  id_horario Int
+  horario Horario @relation(fields: [id_horario], references: [id_horario])
+}
+
+model Suspension {
+  id_suspension Int      @id @default(autoincrement())
+  fecha_inicio  DateTime
+  fecha_fin     DateTime
+  tipo          String   // "PARO" o "VACACIONES"
+  motivo        String?
+  fecha_creacion DateTime @default(now())
+}
