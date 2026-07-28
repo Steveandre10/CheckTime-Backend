@@ -594,6 +594,7 @@ const obtenerReporteAsistencias = async (req, res) => {
                         } else {
                             estadoVirtual = "NO_PRESENTE";
                             observacionVirtual = "Ausente - No registró entrada";
+                            horasPerdidas = clasesProgramadas.length;
                         }
                     }
 
