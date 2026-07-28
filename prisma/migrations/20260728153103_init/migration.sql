@@ -111,6 +111,18 @@ CREATE TABLE "Cobertura" (
     CONSTRAINT "Cobertura_pkey" PRIMARY KEY ("id_cobertura")
 );
 
+-- CreateTable
+CREATE TABLE "Suspension" (
+    "id_suspension" SERIAL NOT NULL,
+    "fecha_inicio" TIMESTAMP(3) NOT NULL,
+    "fecha_fin" TIMESTAMP(3) NOT NULL,
+    "tipo" TEXT NOT NULL,
+    "motivo" TEXT,
+    "fecha_creacion" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Suspension_pkey" PRIMARY KEY ("id_suspension")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuario_correo_key" ON "Usuario"("correo");
 
