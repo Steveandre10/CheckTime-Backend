@@ -1,3 +1,5 @@
+process.env.TZ = process.env.TZ || "America/Bogota";
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -6,6 +8,9 @@ const rateLimit = require("express-rate-limit");
 const path = require("path");
 
 const app = express();
+
+// Trust proxy for express-rate-limit (e.g. on Render)
+app.set("trust proxy", 1);
 
 require("dotenv").config();
 

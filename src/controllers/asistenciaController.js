@@ -1,6 +1,4 @@
-const {PrismaClient} = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const prisma = require('../config/db');
 
 // Helper para parsear fechas YYYY-MM-DD como fechas locales (medianoche)
 const parseLocalDate = (dateString) => {
@@ -592,9 +590,16 @@ const obtenerReporteAsistencias = async (req, res) => {
                             estadoVirtual = "CON_PERMISO";
                             observacionVirtual = novedadAprobada ? "Ausente con novedad aprobada" : "Ausente con permiso aprobado";
                         } else {
-                            estadoVirtual = "NO_PRESENTE";
-                            observacionVirtual = "Ausente - No registró entrada";
-                            horasPerdidas = clasesProgramadas.length;
+                            const esHoy = isSameDay(date, hoy);
+                            if (esHoy) {
+                                estadoVirtual = "PENDIENTE";
+                                observacionVirtual = "Sin registrar asistencia aún";
+                                horasPerdidas = 0;
+                            } else {
+                                estadoVirtual = "NO_PRESENTE";
+                                observacionVirtual = "Ausente - No registró entrada";
+                                horasPerdidas = clasesProgramadas.length;
+                            }
                         }
                     }
 

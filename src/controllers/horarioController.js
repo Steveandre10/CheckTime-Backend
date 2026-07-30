@@ -1,6 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const prisma = require('../config/db');
 
 // Obtener el horario de un profesor en específico
 const obtenerHorarioProfesor = async (req, res) => {

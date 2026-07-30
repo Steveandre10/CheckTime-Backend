@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../config/db');
 
 // Helper function para parsear fechas sin problemas de timezone
 const parseLocalDate = (dateString) => {

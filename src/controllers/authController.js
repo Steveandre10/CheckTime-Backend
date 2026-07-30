@@ -1,8 +1,6 @@
-const { PrismaClient } = require("@prisma/client");
+const prisma = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
-const prisma = new PrismaClient();
 
 // ==========================================
 // EXPLICACIÓN DE FORTIFICACIÓN DE SEGURIDAD:

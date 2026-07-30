@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../config/db');
 
 const parseLocalDateStart = (dateString) => {
     const [year, month, day] = dateString.split('-').map(Number);
