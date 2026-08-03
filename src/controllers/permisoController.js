@@ -16,20 +16,46 @@ const crearPermiso = async (req, res) => {
             });
         }
 
-        // Parse clases_afectadas
-        let clasesAfectadasParsed = [];
-        if (clases_afectadas) {
-            try {
-                clasesAfectadasParsed = typeof clases_afectadas === 'string' ? JSON.parse(clases_afectadas) : clases_afectadas;
-            } catch (err) {
-                console.error("Error al parsear clases_afectadas:", err);
+        // Automatically compute all affected classes for the date range
+        let affectedClasses = [];
+        try {
+            const userSchedules = await prisma.horario.findMany({
+                where: { id_usuario: parseInt(id_usuario) }
+            });
+            const diasSemana = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+            const fInicio = parseLocalDate(fecha_inicio);
+            const fFin = parseLocalDate(fecha_fin);
+            
+            let currentDate = new Date(fInicio);
+            const endDateTime = fFin.getTime();
+            
+            while (currentDate.getTime() <= endDateTime) {
+                const weekdayStr = diasSemana[currentDate.getDay()];
+                const matchingSchedules = userSchedules.filter(s => 
+                    s.dia_semana.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase() === weekdayStr
+                );
+                
+                for (const schedule of matchingSchedules) {
+                    affectedClasses.push({
+                        id_horario: schedule.id_horario,
+                        nombre: schedule.nombre,
+                        hora_inicio: schedule.hora_inicio,
+                        hora_fin: schedule.hora_fin,
+                        bloque: schedule.bloque,
+                        fecha: currentDate.toISOString().split('T')[0]
+                    });
+                }
+                
+                currentDate.setDate(currentDate.getDate() + 1);
             }
+        } catch (err) {
+            console.error("Error al calcular clases afectadas para permiso:", err);
         }
 
         const descData = {
             causa,
             descripcion_breve,
-            clases_afectadas: clasesAfectadasParsed
+            clases_afectadas: affectedClasses
         };
 
         const archivo = req.file ? req.file.filename : null;

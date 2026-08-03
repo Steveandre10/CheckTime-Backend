@@ -225,6 +225,19 @@ const obtenerHorarioGlobalHoy = async (req, res) => {
                     include: {
                         tipo_novedad: true
                     }
+                },
+                permisos: {
+                    where: {
+                        estado: {
+                            in: ["APROBADO", "PENDIENTE"]
+                        },
+                        fecha_inicio: {
+                            lte: finDia
+                        },
+                        fecha_fin: {
+                            gte: inicioDia
+                        }
+                    }
                 }
             }
         });
@@ -243,6 +256,7 @@ const obtenerHorarioGlobalHoy = async (req, res) => {
                 minutos_tardanza: asistencia ? asistencia.minutos_tardanza : null,
                 minutos_salida_anticipada: asistencia ? asistencia.minutos_salida_anticipada : null,
                 novedadesHoy: docente.novedades || [],
+                permisosHoy: docente.permisos || [],
                 clases: docente.horarios.map(h => ({
                     id_horario: h.id_horario,
                     nombre: h.nombre,
