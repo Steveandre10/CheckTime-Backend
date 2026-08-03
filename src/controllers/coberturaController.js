@@ -232,10 +232,12 @@ const obtenerDocentesDisponibles = async (req, res) => {
                 }
             }
 
-            // Regla 5: No debe estar dando clase en el bloque actual
+            // Regla 5: No debe estar dando clase en el bloque actual (excluyendo horas pedagógicas)
             const daClaseEnBloque = docente.horarios.some(h => 
-                (h.hora_inicio === horarioACubrir.hora_inicio && h.hora_fin === horarioACubrir.hora_fin) ||
-                (h.bloque.toUpperCase() === horarioACubrir.bloque.toUpperCase())
+                h.nombre !== "HORA PEDAGOGICA" && (
+                    (h.hora_inicio === horarioACubrir.hora_inicio && h.hora_fin === horarioACubrir.hora_fin) ||
+                    (h.bloque.toUpperCase() === horarioACubrir.bloque.toUpperCase())
+                )
             );
             if (daClaseEnBloque) {
                 continue; // está dando clase -> no sale
